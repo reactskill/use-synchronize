@@ -2,33 +2,36 @@ import { useState, useRef } from 'react'
 import { useSetup, useWatch, useAfterEachRender } from './useEffectHooks'
 import './App.css'
 
-function App({ exit }) {
+interface Props {
+  exit: () => void
+}
+
+function App({ exit }: Props) {
   const [count, setCount] = useState(0)
   const [autoCount, setAutoCount] = useState(0)
   const [countUp, setCountUp] = useState(true)
-  const appRef = useRef(null)
-
   const [score, setScore] = useState(0)
 
-  const countTimerId = useRef(null)
+  const appRef = useRef(document.createElement("div"))
+  const countTimerId = useRef<number | undefined>(undefined)
 
-  const nextCount = count => countUp ? count + 1 : count - 1
+  const nextCount = (count: number) => countUp ? count + 1 : count - 1
 
   const setCountTimer = () => {
-    countTimerId.value = setInterval(() => {
+    countTimerId.current = setInterval(() => {
       setAutoCount(state => state + 1)
     }, 1000)
   }
 
   const clearCountTimer = () => {
-    clearInterval(countTimerId.value)
-    countTimerId.value = null
+    clearInterval(countTimerId.current)
+    countTimerId.current = undefined
   }
 
   const blink = () => {
-    appRef.current.style.opacity = 0.5
+    appRef.current.style.opacity = '0.5'
     setTimeout(() => {
-      appRef.current.style.opacity = 1
+      appRef.current.style.opacity = '1'
     }, 100)
   }
 
