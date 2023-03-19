@@ -8,7 +8,7 @@ interface Props {
 
 function App({ exit }: Props) {
   const [count, setCount] = useState(0)
-  const [autoCount, setAutoCount] = useState(0)
+  const [timerCount, setTimerCount] = useState(0)
   const [countUp, setCountUp] = useState(true)
   const [score, setScore] = useState(0)
 
@@ -17,13 +17,13 @@ function App({ exit }: Props) {
 
   const nextCount = (count: number) => countUp ? count + 1 : count - 1
 
-  const setCountTimer = () => {
+  const setupTimer = () => {
     countTimerId.current = setInterval(() => {
-      setAutoCount(state => state + 1)
+      setTimerCount(state => state + 1)
     }, 1000)
   }
 
-  const clearCountTimer = () => {
+  const clearTimer = () => {
     clearInterval(countTimerId.current)
     countTimerId.current = undefined
   }
@@ -36,8 +36,8 @@ function App({ exit }: Props) {
   }
 
   useSetup(cleanup => {
-    setCountTimer()
-    cleanup(() => { clearCountTimer() })
+    setupTimer()
+    cleanup(() => { clearTimer() })
   })
 
   useWatch([count], () => {
@@ -49,9 +49,9 @@ function App({ exit }: Props) {
     }
   })
 
-  useWatch([count, autoCount], () => {
-    if(count === autoCount % 10) {
-      if(autoCount !== 0) {
+  useWatch([count, timerCount], () => {
+    if(count === timerCount % 10) {
+      if(timerCount !== 0) {
         setScore(state => state + 1)
       }
     }
@@ -67,7 +67,7 @@ function App({ exit }: Props) {
 
   return (
     <div className="App" ref={appRef}>
-      <p>Auto Count: {autoCount}</p>
+      <p>Timer: {timerCount}</p>
       <p>Count: {count}</p>
       <p>
         <button onClick={() => clickAddCount()}>Add Count</button>
