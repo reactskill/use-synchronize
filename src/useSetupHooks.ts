@@ -4,34 +4,41 @@ type CleanupCallback = () => void
 type CleanupSetter = (cleanupCallback: CleanupCallback) => void
 type SetupCallback = (cleanupSetter: CleanupSetter) => void
 
-export function useSetup(setupCallback: SetupCallback) {
+function on(list?: DependencyList) {
 
-  let _cleanup: { callback?: CleanupCallback } = {}
   let _depList: { list?: DependencyList } = { list: [] }
 
-  const setCleanup: CleanupSetter = (cleanup: CleanupCallback) => {
-    _cleanup.callback = cleanup
-  }
-
-  const execute = () => {
-    useEffect(() => {
-      setupCallback(setCleanup)
-      return _cleanup.callback
-    }, _depList.list)  
-  }
+  _depList.list = list
 
   return {
-    once() {
-      _depList.list = []
-      execute()
-    },
-    resync(list: DependencyList) {
-      _depList.list = list
-      execute()
-    },
-    resyncOnEachRender() {
-      _depList.list = undefined
+    useSetup: function (setupCallback: SetupCallback) {
+
+      let _cleanup: { callback?: CleanupCallback } = {}
+
+      const setCleanup: CleanupSetter = (cleanup: CleanupCallback) => {
+        _cleanup.callback = cleanup
+      }
+
+      const execute = () => {
+        useEffect(() => {
+          setupCallback(setCleanup)
+          return _cleanup.callback
+        }, _depList.list)  
+      }
+
       execute()
     }
   }
+}
+
+export function onMount() {
+  return on([])
+}
+
+export function onChange(list: DependencyList) {
+  return on(list)
+}
+
+export function onRender() {
+  return on()
 }
