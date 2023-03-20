@@ -31,8 +31,8 @@ function on(list?: DependencyList) {
   }
 }
 
-export function onMount() {
-  return on([])
+export function useSetup(setupCallback: SetupCallback) {
+  on([]).useSetup(setupCallback)
 }
 
 export function onChange(list: DependencyList) {

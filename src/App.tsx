@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { onChange, onMount, onRender } from './useSetupHooks'
+import { useSetup, onChange, onRender } from './useSetupHooks'
 import './App.css'
 
 interface Props {
@@ -11,6 +11,10 @@ function App({ exit }: Props) {
   const [timerCount, setTimerCount] = useState(0)
   const [countUp, setCountUp] = useState(true)
   const [score, setScore] = useState(0)
+
+  if(true) {
+    useState(1)
+  }
 
   const appRef = useRef(document.createElement("div"))
 
@@ -29,7 +33,7 @@ function App({ exit }: Props) {
     }, 100)
   }
 
-  onMount().useSetup(cleanup => {
+  useSetup(cleanup => {
     const intervalId = setupTimer()
     cleanup(() => { clearInterval(intervalId) })
   })
