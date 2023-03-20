@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useSetup, useSetupResync, useSetupResyncEachRender } from './useSetupHooks'
+import { useSetup } from './useSetupHooks'
 import './App.css'
 
 interface Props {
@@ -34,29 +34,29 @@ function App({ exit }: Props) {
     cleanup(() => { clearInterval(intervalId) })
   })
 
-  useSetupResync([count], () => {
+  useSetup(() => {
     if(count >= 9) {
       setCountUp(false)
     }
     if(count <= 0) {
       setCountUp(true)
     }
-  })
+  }).resync([count])
 
-  useSetupResync([count, timerCount], () => {
+  useSetup(() => {
     if(count === timerCount % 10) {
       if(timerCount !== 0) {
         setScore(state => state + 1)
       }
     }
-  })
+  }).resync([count, timerCount])
 
-  useSetupResyncEachRender(cleanup => {
+  useSetup(cleanup => {
     const timeoutId = blink()
     cleanup(() => {
       clearTimeout(timeoutId)
     })
-  })
+  }).resyncOnEachRender()
 
   const clickAddCount = () => {
     setCount(count => nextCount(count))

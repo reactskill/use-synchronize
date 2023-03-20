@@ -3,30 +3,35 @@ import { useEffect, DependencyList } from "react";
 type CleanupCallback = () => void
 type CleanupSetter = (cleanupCallback: CleanupCallback) => void
 type SetupCallback = (cleanupSetter: CleanupSetter) => void
-type WatchList = DependencyList
-
-function _useSetup(setupCallback: SetupCallback, list?: WatchList) {
-
-  let _cleanup: CleanupCallback
-
-  const setCleanup: CleanupSetter = (cleanup: CleanupCallback) => {
-    _cleanup = cleanup
-  }
-
-  useEffect(() => {
-    setupCallback(setCleanup)
-    return _cleanup
-  }, list)
-}
 
 export function useSetup(setupCallback: SetupCallback) {
-  _useSetup(setupCallback, [])
-}
 
-export function useSetupResync(list: WatchList, setupCallback: SetupCallback) {
-  _useSetup(setupCallback, list)
-}
+  let _cleanup: { callback?: CleanupCallback } = {}
+  let _depList: { list?: DependencyList } = { list: [] }
 
-export function useSetupResyncEachRender(setupCallback: SetupCallback) {
-  _useSetup(setupCallback)
+  const setCleanup: CleanupSetter = (cleanup: CleanupCallback) => {
+    _cleanup.callback = cleanup
+  }
+
+  const execute = () => {
+    useEffect(() => {
+      setupCallback(setCleanup)
+      return _cleanup.callback
+    }, _depList.list)  
+  }
+
+  return {
+    once() {
+      _depList.list = []
+      execute()
+    },
+    resync(list: DependencyList) {
+      _depList.list = list
+      execute()
+    },
+    resyncOnEachRender() {
+      _depList.list = undefined
+      execute()
+    }
+  }
 }
