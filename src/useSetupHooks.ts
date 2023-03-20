@@ -35,10 +35,6 @@ export function useSetup(setupCallback: SetupCallback) {
   on([]).useSetup(setupCallback)
 }
 
-export function onChange(list: DependencyList) {
+export function onChange(list?: DependencyList) {
   return on(list)
-}
-
-export function onRender() {
-  return on()
 }

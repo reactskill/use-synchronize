@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useSetup, onChange, onRender } from './useSetupHooks'
+import { useSetup, onChange } from './useSetupHooks'
 import './App.css'
 
 interface Props {
@@ -55,7 +55,7 @@ function App({ exit }: Props) {
     }
   })
 
-  onRender().useSetup(cleanup => {
+  onChange().useSetup(cleanup => {
     const timeoutId = blink()
     cleanup(() => {
       clearTimeout(timeoutId)
