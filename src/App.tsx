@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useSetup, useWatch, useAfterEachRender } from './useEffectHooks'
+import { useSetup, useSetupResync, useSetupResyncEachRender } from './useSetupHooks'
 import './App.css'
 
 interface Props {
@@ -13,34 +13,28 @@ function App({ exit }: Props) {
   const [score, setScore] = useState(0)
 
   const appRef = useRef(document.createElement("div"))
-  const countTimerId = useRef<number | undefined>(undefined)
 
   const nextCount = (count: number) => countUp ? count + 1 : count - 1
 
   const setupTimer = () => {
-    countTimerId.current = setInterval(() => {
+    return setInterval(() => {
       setTimerCount(state => state + 1)
     }, 1000)
   }
 
-  const clearTimer = () => {
-    clearInterval(countTimerId.current)
-    countTimerId.current = undefined
-  }
-
   const blink = () => {
     appRef.current.style.opacity = '0.5'
-    setTimeout(() => {
+    return setTimeout(() => {
       appRef.current.style.opacity = '1'
     }, 100)
   }
 
   useSetup(cleanup => {
-    setupTimer()
-    cleanup(() => { clearTimer() })
+    const intervalId = setupTimer()
+    cleanup(() => { clearInterval(intervalId) })
   })
 
-  useWatch([count], () => {
+  useSetupResync([count], () => {
     if(count >= 9) {
       setCountUp(false)
     }
@@ -49,7 +43,7 @@ function App({ exit }: Props) {
     }
   })
 
-  useWatch([count, timerCount], () => {
+  useSetupResync([count, timerCount], () => {
     if(count === timerCount % 10) {
       if(timerCount !== 0) {
         setScore(state => state + 1)
@@ -57,8 +51,11 @@ function App({ exit }: Props) {
     }
   })
 
-  useAfterEachRender(() => {
-    blink()
+  useSetupResyncEachRender(cleanup => {
+    const timeoutId = blink()
+    cleanup(() => {
+      clearTimeout(timeoutId)
+    })
   })
 
   const clickAddCount = () => {
