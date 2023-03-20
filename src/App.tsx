@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useSetup, onChange } from './useSetupHooks'
+import { useSetup } from './useSetup'
 import './App.css'
 
 interface Props {
@@ -26,19 +26,12 @@ function App({ exit }: Props) {
     }, 1000)
   }
 
-  const blink = () => {
-    appRef.current.style.opacity = '0.5'
-    return setTimeout(() => {
-      appRef.current.style.opacity = '1'
-    }, 100)
-  }
-
   useSetup(cleanup => {
     const intervalId = setupTimer()
     cleanup(() => { clearInterval(intervalId) })
   })
 
-  onChange([count]).useSetup(() => {
+  useSetup([count], () => {
     if(count >= 9) {
       setCountUp(false)
     }
@@ -47,19 +40,12 @@ function App({ exit }: Props) {
     }
   })
 
-  onChange([count, timerCount]).useSetup(() => {
+  useSetup([count, timerCount], () => {
     if(count === timerCount % 10) {
       if(timerCount !== 0) {
         setScore(state => state + 1)
       }
     }
-  })
-
-  onChange().useSetup(cleanup => {
-    const timeoutId = blink()
-    cleanup(() => {
-      clearTimeout(timeoutId)
-    })
   })
 
   const clickAddCount = () => {
