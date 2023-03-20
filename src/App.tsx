@@ -20,14 +20,16 @@ function App({ exit }: Props) {
 
   const nextCount = (count: number) => countUp ? count + 1 : count - 1
 
-  useSynchronize(function timer(withCleanup) {
+  // timer
+  useSynchronize(withCleanup => {
     const intervalId = setInterval(() => {
       setTimerCount(state => state + 1)
     }, 1000)
     withCleanup(() => { clearInterval(intervalId) })
   })
 
-  useSynchronize([count], function countDirection() {
+  // count direction
+  useSynchronize([count], () => {
     if(count >= 9) {
       setCountUp(false)
     }
@@ -36,7 +38,8 @@ function App({ exit }: Props) {
     }
   })
 
-  useSynchronize([count, timerCount], function score() {
+  // score
+  useSynchronize([count, timerCount], () => {
     if(count === timerCount % 10) {
       if(timerCount !== 0) {
         setScore(state => state + 1)
