@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useSetup } from './useSetup'
+import { useSynchronize } from './useSynchronize'
 import './App.css'
 
 interface Props {
@@ -20,18 +20,14 @@ function App({ exit }: Props) {
 
   const nextCount = (count: number) => countUp ? count + 1 : count - 1
 
-  const setupTimer = () => {
-    return setInterval(() => {
+  useSynchronize(function timer(withCleanup) {
+    const intervalId = setInterval(() => {
       setTimerCount(state => state + 1)
     }, 1000)
-  }
-
-  useSetup(cleanup => {
-    const intervalId = setupTimer()
-    cleanup(() => { clearInterval(intervalId) })
+    withCleanup(() => { clearInterval(intervalId) })
   })
 
-  useSetup([count], () => {
+  useSynchronize([count], function countDirection() {
     if(count >= 9) {
       setCountUp(false)
     }
@@ -40,7 +36,7 @@ function App({ exit }: Props) {
     }
   })
 
-  useSetup([count, timerCount], () => {
+  useSynchronize([count, timerCount], function score() {
     if(count === timerCount % 10) {
       if(timerCount !== 0) {
         setScore(state => state + 1)

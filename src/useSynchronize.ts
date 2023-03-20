@@ -4,9 +4,9 @@ type CleanupCallback = () => void
 type CleanupSetter = (cleanupCallback: CleanupCallback) => void
 type SetupCallback = (cleanupSetter: CleanupSetter) => void
 
-export function useSetup(callback: SetupCallback): void
-export function useSetup(list: DependencyList, callback: SetupCallback): void
-export function useSetup(listOrCallback: DependencyList | SetupCallback, callback?: SetupCallback | undefined) {
+export function useSynchronize(callback: SetupCallback): void
+export function useSynchronize(list: DependencyList, callback: SetupCallback): void
+export function useSynchronize(listOrCallback: DependencyList | SetupCallback, callback?: SetupCallback | undefined) {
 
   let _depList: DependencyList | undefined
   let _cleanupCallback: CleanupCallback | undefined
@@ -23,7 +23,6 @@ export function useSetup(listOrCallback: DependencyList | SetupCallback, callbac
     _depList = listOrCallback
     _setupCallback = callback
   }
-
 
   if(_setupCallback === undefined) return
 
