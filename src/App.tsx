@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { useSynchronize } from './useSynchronize'
+import { useState, useEffect, useRef } from 'react'
+
 import './App.css'
 
 interface Props {
@@ -21,31 +21,31 @@ function App({ exit }: Props) {
   const nextCount = (count: number) => countUp ? count + 1 : count - 1
 
   // timer
-  useSynchronize(withCleanup => {
+  useEffect(() => {
     const intervalId = setInterval(() => {
       setTimerCount(state => state + 1)
     }, 1000)
-    withCleanup(() => { clearInterval(intervalId) })
-  })
+    return () => { clearInterval(intervalId) }
+  }, [])
 
   // count direction
-  useSynchronize([count], () => {
+  useEffect(() => {
     if(count >= 9) {
       setCountUp(false)
     }
     if(count <= 0) {
       setCountUp(true)
     }
-  })
+  }, [count])
 
   // score
-  useSynchronize([count, timerCount], () => {
+  useEffect(() => {
     if(count === timerCount % 10) {
       if(timerCount !== 0) {
         setScore(state => state + 1)
       }
     }
-  })
+  }, [count, timerCount])
 
   const clickAddCount = () => {
     setCount(count => nextCount(count))
