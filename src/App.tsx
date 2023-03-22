@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react'
-import { useSynchronize } from './useSynchronize'
+import { useState, useCallback, useRef } from 'react'
+import { useSynchronize, useSynchronizeDOM } from './useSynchronize'
 import './App.css'
 
 interface Props {
@@ -12,11 +12,13 @@ function App({ exit }: Props) {
   const [countUp, setCountUp] = useState(true)
   const [score, setScore] = useState(0)
 
+  const cb = useCallback(() => {
+    console.log(count)
+  },[count])
+
   if(true) {
     useState(1)
   }
-
-  const appRef = useRef(document.createElement("div"))
 
   const nextCount = (count: number) => countUp ? count + 1 : count - 1
 
@@ -50,6 +52,20 @@ function App({ exit }: Props) {
   const clickAddCount = () => {
     setCount(count => nextCount(count))
   }
+
+  const timeoutIdRef = useRef(-1)
+
+  const appRef = useSynchronizeDOM<HTMLDivElement>(node => {
+    if (node !== null) {
+      node.style.opacity = '0.5'
+      timeoutIdRef.current = setTimeout(() => {
+        node.style.opacity = '1'
+      }, 100)
+    }
+    else {
+      clearTimeout(timeoutIdRef.current) 
+    }
+  }, [count])
 
   return (
     <div className="App" ref={appRef}>

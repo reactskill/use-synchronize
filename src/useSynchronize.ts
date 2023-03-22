@@ -1,4 +1,4 @@
-import { useEffect, DependencyList } from "react";
+import { useEffect, DependencyList, useCallback } from "react";
 
 type CleanupCallback = () => void
 type CleanupSetter = (cleanupCallback: CleanupCallback) => void
@@ -30,4 +30,13 @@ export function useSynchronize(listOrCallback: DependencyList | SetupCallback, c
     _setupCallback!(setCleanup)
     return _cleanupCallback
   }, _depList)
+}
+
+type CallbackRef<T> = (node: T | null) => void
+type DOMSetup<T> = (node: T | null) => void
+
+export function useSynchronizeDOM<T>(setup: DOMSetup<T>, list?: DependencyList): CallbackRef<T> {
+  return useCallback((node: T | null) => {
+    setup(node)
+  }, list ? list : [])
 }
